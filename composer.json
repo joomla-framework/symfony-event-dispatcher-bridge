@@ -1,0 +1,33 @@
+{
+    "name": "joomla/symfony-event-dispatcher-bridge",
+    "type": "joomla-package",
+    "description": "Joomla/Symfony Event Dispatcher Bridge",
+    "keywords": ["joomla", "framework", "symfony", "event", "dispatcher", "bridge"],
+    "homepage": "https://github.com/joomla-framework/preload",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "php": "~7.0",
+        "joomla/event": "~2.0",
+        "symfony/event-dispatcher": "~3.4|~4.0"
+    },
+    "require-dev": {
+        "joomla/coding-standards": "~2.0@alpha",
+        "phpunit/phpunit": "~6.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Joomla\\SymfonyEventDispatcherBridge\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Joomla\\SymfonyEventDispatcherBridge\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.0-dev"
+        }
+    }
+}
