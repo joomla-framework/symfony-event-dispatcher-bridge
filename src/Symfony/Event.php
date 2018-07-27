@@ -6,13 +6,13 @@
  * @license    GNU General Public License version 2 or later; see LICENSE
  */
 
-namespace Joomla\SymfonyEventDispatcherBridge;
+namespace Joomla\SymfonyEventDispatcherBridge\Symfony;
 
 use Joomla\Event\EventInterface;
 use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
 
 /**
- * Bridge class mapping the Symfony Event class to the Joomla Event interface
+ * Bridge class decorating the Symfony Event class with the Joomla EventInterface
  *
  * @since  __DEPLOY_VERSION__
  */
@@ -88,7 +88,7 @@ class Event implements EventInterface
 		// We did our best.
 		throw new \RuntimeException(
 			sprintf(
-				'Neither the property "%1$s" nor a method with public read access exists in class "%2$s".',
+				'Neither the property "%1$s" nor a method with public read access (get/has/is) exists in class "%2$s".',
 				$name,
 				\get_class($this->getEvent())
 			)

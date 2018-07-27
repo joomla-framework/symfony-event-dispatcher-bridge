@@ -6,7 +6,7 @@
  * @license    GNU General Public License version 2 or later; see LICENSE
  */
 
-namespace Joomla\SymfonyEventDispatcherBridge;
+namespace Joomla\SymfonyEventDispatcherBridge\Symfony;
 
 use Joomla\Event\DispatcherInterface;
 use Joomla\Event\EventInterface;
@@ -16,14 +16,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Bridge class mapping the Symfony EventDispatcher class to the Joomla Dispatcher interface
+ * Bridge class decorating a Symfony EventDispatcherInterface implementation with the Joomla DispatcherInterface
  *
  * @since  __DEPLOY_VERSION__
  */
-class Dispatcher implements DispatcherInterface
+class EventDispatcher implements DispatcherInterface
 {
 	/**
-	 * The delegated dispatcher.
+	 * The decorated dispatcher.
 	 *
 	 * @var    EventDispatcherInterface
 	 * @since  __DEPLOY_VERSION__
@@ -41,7 +41,7 @@ class Dispatcher implements DispatcherInterface
 	/**
 	 * Constructor.
 	 *
-	 * @param   EventDispatcherInterface  $dispatcher  The delegated dispatcher.
+	 * @param   EventDispatcherInterface  $dispatcher  The decorated dispatcher.
 	 *
 	 * @since   __DEPLOY_VERSION__
 	 */
@@ -239,7 +239,7 @@ class Dispatcher implements DispatcherInterface
 			private static $subscriber;
 
 			/**
-			 * Decorating subscriber  constructor.
+			 * Decorating subscriber constructor.
 			 *
 			 * @param   SubscriberInterface  $subscriber  The subscriber being decorated.
 			 *
