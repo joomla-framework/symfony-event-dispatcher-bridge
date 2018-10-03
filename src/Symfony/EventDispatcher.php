@@ -268,7 +268,7 @@ class EventDispatcher implements DispatcherInterface
 
 				foreach (self::$subscriber->getSubscribedEvents() as $eventName => $params)
 				{
-					if (is_array($params))
+					if (\is_array($params))
 					{
 						$subscribedEvents[] = [$eventName => [self::$subscriber, $params[0]], $params[1] ?? Priority::NORMAL];
 					}

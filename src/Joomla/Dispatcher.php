@@ -191,7 +191,7 @@ class Dispatcher implements EventDispatcherInterface
 			return false;
 		}
 
-		return count($this->getListeners($eventName)) > 0;
+		return \count($this->getListeners($eventName)) > 0;
 	}
 
 	/**
@@ -294,13 +294,13 @@ class Dispatcher implements EventDispatcherInterface
 					}
 					elseif (\is_string($params[0]))
 					{
-						$subscribedEvents[] = [$eventName => [self::$subscriber, $params[0]], isset($params[1]) ? $params[1] : 0];
+						$subscribedEvents[] = [$eventName => [self::$subscriber, $params[0]], $params[1] ?? 0];
 					}
 					else
 					{
 						foreach ($params as $listener)
 						{
-							$subscribedEvents[] = [$eventName => [self::$subscriber, $listener[0]], isset($listener[1]) ? $listener[1] : 0];
+							$subscribedEvents[] = [$eventName => [self::$subscriber, $listener[0]], $listener[1] ?? 0];
 						}
 					}
 				}
