@@ -10,6 +10,7 @@ namespace Joomla\SymfonyEventDispatcherBridge\Symfony;
 
 use Joomla\Event\EventInterface;
 use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
+use Symfony\Component\EventDispatcher\GenericEvent;
 
 /**
  * Bridge class decorating the Symfony Event class with the Joomla EventInterface
@@ -56,6 +57,17 @@ class Event implements EventInterface
 			return $this->getEvent()->$name;
 		}
 
+		// If a GenericEvent, use its API
+		if ($this->getEvent() instanceof GenericEvent)
+		{
+			if ($this->getEvent()->hasArgument($name))
+			{
+				return $this->getEvent()->getArgument($name);
+			}
+
+			return $default;
+		}
+
 		$methods = get_class_methods($this->getEvent());
 
 		sort($methods);
@@ -86,13 +98,7 @@ class Event implements EventInterface
 		}
 
 		// We did our best.
-		throw new \RuntimeException(
-			sprintf(
-				'Neither the property "%1$s" nor a method with public read access (get/has/is) exists in class "%2$s".',
-				$name,
-				\get_class($this->getEvent())
-			)
-		);
+		return $default;
 	}
 
 	/**
