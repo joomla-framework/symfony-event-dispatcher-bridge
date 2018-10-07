@@ -209,11 +209,9 @@ class DispatcherTest extends TestCase
 	}
 
 	/**
-	 * @testdox  A non-decorated Symfony event is not dispatched
-	 *
-	 * @expectedException  \InvalidArgumentException
+	 * @testdox  A non-decorated Symfony event is dispatched
 	 */
-	public function testANonDecoratedSymfonyEventIsNotDispatched()
+	public function testANonDecoratedSymfonyEventIsDispatched()
 	{
 		$subscriber = new class implements SymfonySubscriber
 		{
@@ -239,7 +237,9 @@ class DispatcherTest extends TestCase
 		$dispatcher = new Dispatcher($decoratedDispatcher);
 		$dispatcher->addSubscriber($subscriber);
 
-		$dispatcher->dispatch('testEvent', $event);
+		$this->assertSame($event, $dispatcher->dispatch('testEvent', $event));
+
+		$this->assertTrue($subscriber->isCalled);
 	}
 
 	/**

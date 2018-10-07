@@ -12,6 +12,7 @@ use Joomla\Event\DispatcherInterface;
 use Joomla\Event\EventInterface;
 use Joomla\Event\Priority;
 use Joomla\Event\SubscriberInterface;
+use Joomla\SymfonyEventDispatcherBridge\Joomla\Event as JoomlaBridgeEvent;
 use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -116,14 +117,11 @@ class EventDispatcher implements DispatcherInterface
 			return $event;
 		}
 
-		throw new \InvalidArgumentException(
-			sprintf(
-				'The "%1$s" class requires event objects to be an instance of either "%2$s" or "%3$s".',
-				static::class,
-				Event::class,
-				SymfonyEvent::class
-			)
-		);
+		$decoratingEvent = new JoomlaBridgeEvent($event);
+
+		$this->dispatcher->dispatch($name, $decoratingEvent);
+
+		return $event;
 	}
 
 	/**

@@ -210,11 +210,9 @@ class EventDispatcherTest extends TestCase
 	}
 
 	/**
-	 * @testdox  A non-decorated Joomla event is not dispatched
-	 *
-	 * @expectedException  \InvalidArgumentException
+	 * @testdox  A non-decorated Joomla event is dispatched
 	 */
-	public function testANonDecoratedJoomlaEventIsNotDispatched()
+	public function testANonDecoratedJoomlaEventIsDispatched()
 	{
 		$subscriber = new class implements JoomlaSubscriber
 		{
@@ -240,7 +238,9 @@ class EventDispatcherTest extends TestCase
 		$dispatcher = new EventDispatcher($decoratedDispatcher);
 		$dispatcher->addSubscriber($subscriber);
 
-		$dispatcher->dispatch('testEvent', $event);
+		$this->assertSame($event, $dispatcher->dispatch('testEvent', $event));
+
+		$this->assertTrue($subscriber->isCalled);
 	}
 
 	/**

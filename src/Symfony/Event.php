@@ -17,7 +17,7 @@ use Symfony\Component\EventDispatcher\GenericEvent;
  *
  * @since  __DEPLOY_VERSION__
  */
-class Event implements EventInterface
+class Event extends SymfonyEvent implements EventInterface
 {
 	/**
 	 * The decorated event.
@@ -28,15 +28,49 @@ class Event implements EventInterface
 	private $event;
 
 	/**
+	 * The event name.
+	 *
+	 * @var    string
+	 * @since  1.0
+	 */
+	private $name;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param   SymfonyEvent  $event  The event to decorate.
+	 * @param   string        $name   The event name.
 	 *
 	 * @since   __DEPLOY_VERSION__
 	 */
-	public function __construct(SymfonyEvent $event)
+	public function __construct(SymfonyEvent $event, string $name = '')
 	{
 		$this->event = $event;
+
+		// Symfony Event objects do not have the event name attached to them, so just use the event class name if one isn't provided
+		$this->name = $name ?: get_class($event);
+	}
+
+	/**
+	 * Magic method to proxy method calls to the decorated event.
+	 *
+	 * @param   string  $name       The method on the event to call.
+	 * @param   array   $arguments  The arguments to pass to the event.
+	 *
+	 * @return  mixed   The result of the method call.
+	 *
+	 * @since   __DEPLOY_VERSION__
+	 */
+	public function __call($name, $arguments)
+	{
+		if (!method_exists($this->event, $name))
+		{
+			throw new \BadMethodCallException(
+				sprintf('Call to undefined method %1$s on decorated event %2$s', $name, \get_class($this->event))
+			);
+		}
+
+		return $this->event->$name(...$arguments);
 	}
 
 	/**
@@ -122,8 +156,7 @@ class Event implements EventInterface
 	 */
 	public function getName()
 	{
-		// Symfony Event objects do not have the event name attached to them, so just use the event class name
-		return \get_class($this->getEvent());
+		return $this->name;
 	}
 
 	/**
