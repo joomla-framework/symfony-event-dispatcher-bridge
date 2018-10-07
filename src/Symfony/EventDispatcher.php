@@ -10,6 +10,7 @@ namespace Joomla\SymfonyEventDispatcherBridge\Symfony;
 
 use Joomla\Event\DispatcherInterface;
 use Joomla\Event\EventInterface;
+use Joomla\Event\Priority;
 use Joomla\Event\SubscriberInterface;
 use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -63,7 +64,9 @@ class EventDispatcher implements DispatcherInterface
 	 */
 	public function addListener(string $eventName, callable $callback, int $priority = 0): bool
 	{
-		return $this->dispatcher->addListener($eventName, $callback, $priority);
+		$this->dispatcher->addListener($eventName, $callback, $priority);
+
+		return true;
 	}
 
 	/**
@@ -251,6 +254,33 @@ class EventDispatcher implements DispatcherInterface
 			}
 
 			/**
+			 * Magic method to proxy subscriber method calls.
+			 *
+			 * @param   string  $name       The method on the subscriber to call.
+			 * @param   array   $arguments  The arguments to pass to the subscriber.
+			 *
+			 * @return  mixed   The filtered input value.
+			 *
+			 * @since   __DEPLOY_VERSION__
+			 */
+			public function __call($name, $arguments)
+			{
+				if (self::$subscriber === null)
+				{
+					throw new \RuntimeException('The wrapped subscriber was not correctly initialised');
+				}
+
+				if (!method_exists(self::$subscriber, $name))
+				{
+					throw new \BadMethodCallException(
+						sprintf('Call to undefined method %1$s on decorated dispatcher %2$s', $name, \get_class(self::$subscriber))
+					);
+				}
+
+				self::$subscriber->$name(...$arguments);
+			}
+
+			/**
 			 * Returns an array of event names this subscriber wants to listen to.
 			 *
 			 * @return  array
@@ -259,7 +289,7 @@ class EventDispatcher implements DispatcherInterface
 			 */
 			public static function getSubscribedEvents()
 			{
-				if (self::$events === null)
+				if (self::$subscriber === null)
 				{
 					throw new \RuntimeException('The wrapped subscriber was not correctly initialised');
 				}
@@ -270,11 +300,11 @@ class EventDispatcher implements DispatcherInterface
 				{
 					if (\is_array($params))
 					{
-						$subscribedEvents[] = [$eventName => [self::$subscriber, $params[0]], $params[1] ?? Priority::NORMAL];
+						$subscribedEvents[$eventName][] = [$listener[0], $listener[1] ?? Priority::NORMAL];
 					}
 					else
 					{
-						$subscribedEvents[] = [$eventName => [self::$subscriber, $params]];
+						$subscribedEvents[$eventName][] = $params;
 					}
 				}
 
