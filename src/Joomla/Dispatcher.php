@@ -271,6 +271,33 @@ class Dispatcher implements EventDispatcherInterface
 			}
 
 			/**
+			 * Magic method to proxy subscriber method calls.
+			 *
+			 * @param   string  $name       The method on the subscriber to call.
+			 * @param   array   $arguments  The arguments to pass to the subscriber.
+			 *
+			 * @return  mixed   The filtered input value.
+			 *
+			 * @since   __DEPLOY_VERSION__
+			 */
+			public function __call($name, $arguments)
+			{
+				if (self::$subscriber === null)
+				{
+					throw new \RuntimeException('The wrapped subscriber was not correctly initialised');
+				}
+
+				if (!method_exists(self::$subscriber, $name))
+				{
+					throw new \BadMethodCallException(
+						sprintf('Call to undefined method %1$s on decorated dispatcher %2$s', $name, \get_class(self::$subscriber))
+					);
+				}
+
+				self::$subscriber->$name(...$arguments);
+			}
+
+			/**
 			 * Returns an array of event names this subscriber wants to listen to.
 			 *
 			 * @return  array
@@ -279,7 +306,7 @@ class Dispatcher implements EventDispatcherInterface
 			 */
 			public static function getSubscribedEvents(): array
 			{
-				if (self::$events === null)
+				if (self::$subscriber === null)
 				{
 					throw new \RuntimeException('The wrapped subscriber was not correctly initialised');
 				}
@@ -290,17 +317,17 @@ class Dispatcher implements EventDispatcherInterface
 				{
 					if (\is_string($params))
 					{
-						$subscribedEvents[] = [$eventName => [self::$subscriber, $params]];
+						$subscribedEvents[$eventName][] = $params;
 					}
 					elseif (\is_string($params[0]))
 					{
-						$subscribedEvents[] = [$eventName => [self::$subscriber, $params[0]], $params[1] ?? 0];
+						$subscribedEvents[$eventName][] = [$params[0], $params[1] ?? 0];
 					}
 					else
 					{
 						foreach ($params as $listener)
 						{
-							$subscribedEvents[] = [$eventName => [self::$subscriber, $listener[0]], $listener[1] ?? 0];
+							$subscribedEvents[$eventName][] = [$listener[0], $listener[1] ?? 0];
 						}
 					}
 				}
